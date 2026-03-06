@@ -2655,8 +2655,7 @@ const normalizeArray = (value) => {
               })}
 
               {panelSelection.map((id, idx) => {
-                const settings = plotSettings[id];
-                if (!settings) return null;
+                const settings = plotSettings[id] || { color: defaultColors[idx % defaultColors.length], shape: 'circle', strokeDash: '0', secondaryColor: defaultColors[idx % defaultColors.length], secondaryStrokeWidth: 1 };
                 const isGroup = id.startsWith('GRP_');
                 const displayName = getDisplayName(id, isGroup);
 
@@ -2732,14 +2731,44 @@ const initializeDashboard = (json) => {
     const newSettings = { ...plotSettings };
     let needsSave = false;
     let initialSelection = [...selectedIds];
+    const availableBioreactors = json.bioreactors ? Object.keys(json.bioreactors) : [];
+    const availableGroups = parsed.groups ? Object.keys(parsed.groups).map(grp => `GRP_${grp}`) : [];
+    const availableCustomGroups = customRefGroups.map(grp => `CREF_${grp.id}`);
+    const availableSelectionIds = new Set([...availableBioreactors, ...availableGroups, ...availableCustomGroups]);
+    initialSelection = initialSelection.filter(id => availableSelectionIds.has(id));
+
     if (json.bioreactors) Object.keys(json.bioreactors).forEach((key, index) => {
-        if (!newSettings[key]) { newSettings[key] = { color: defaultColors[index % defaultColors.length], shape: 'circle', strokeDash: '0', secondaryColor: defaultColors[index % defaultColors.length], secondaryStrokeWidth: 1 }; needsSave = true; }
+        const baseColor = defaultColors[index % defaultColors.length];
+        const existing = newSettings[key] || {};
+        const normalized = {
+          color: existing.color || baseColor,
+          shape: existing.shape || 'circle',
+          strokeDash: existing.strokeDash || '0',
+          secondaryColor: existing.secondaryColor || existing.color || baseColor,
+          secondaryStrokeWidth: Number.isFinite(existing.secondaryStrokeWidth) ? existing.secondaryStrokeWidth : 1
+        };
+        if (JSON.stringify(existing) !== JSON.stringify(normalized)) {
+          newSettings[key] = normalized;
+          needsSave = true;
+        }
         // Auto-select first 3 bioreactors (never GRP_ on first load)
         if (initialSelection.length === 0 && index < 3) initialSelection.push(key);
     });
     if (parsed.groups) Object.keys(parsed.groups).forEach((grp, index) => {
         const grpKey = `GRP_${grp}`;
-        if (!newSettings[grpKey]) { newSettings[grpKey] = { color: index === 0 ? '#334155' : index === 1 ? '#64748b' : '#94a3b8', shape: 'triangle', strokeDash: '5 5', secondaryColor: index === 0 ? '#334155' : index === 1 ? '#64748b' : '#94a3b8', secondaryStrokeWidth: 1 }; needsSave = true; }
+        const grpColor = index === 0 ? '#334155' : index === 1 ? '#64748b' : '#94a3b8';
+        const existing = newSettings[grpKey] || {};
+        const normalized = {
+          color: existing.color || grpColor,
+          shape: existing.shape || 'triangle',
+          strokeDash: existing.strokeDash || '5 5',
+          secondaryColor: existing.secondaryColor || existing.color || grpColor,
+          secondaryStrokeWidth: Number.isFinite(existing.secondaryStrokeWidth) ? existing.secondaryStrokeWidth : 1
+        };
+        if (JSON.stringify(existing) !== JSON.stringify(normalized)) {
+          newSettings[grpKey] = normalized;
+          needsSave = true;
+        }
         // NOTE: GRP_ groups are NOT auto-selected — user activates them manually via Reference Groups sidebar
     });
     // Default styles for custom reference groups
@@ -3894,8 +3923,7 @@ const initializeDashboard = (json) => {
                               })}
 
                               {displayIds.map((id, idx) => {
-                                const settings = plotSettings[id];
-                                if (!settings) return null;
+                                const settings = plotSettings[id] || { color: defaultColors[idx % defaultColors.length], shape: 'circle', strokeDash: '0', secondaryColor: defaultColors[idx % defaultColors.length], secondaryStrokeWidth: 1 };
                                 const isGrp = id.startsWith('GRP_');
                                 const displayName = isGrp ? `AVG: ${groupName}` : id;
                                 const showSecondary = panelSettings.enableDualAxis && (!onlyRefSecondary || isGrp);
@@ -4032,8 +4060,7 @@ const initializeDashboard = (json) => {
                         );
                       })}
 {selectedIds.map((id, sIdx) => {
-                        const settings = plotSettings[id];
-                        if (!settings) return null;
+                        const settings = plotSettings[id] || { color: defaultColors[sIdx % defaultColors.length], shape: 'circle', strokeDash: '0', secondaryColor: defaultColors[sIdx % defaultColors.length], secondaryStrokeWidth: 1 };
                         const isGroup = id.startsWith('GRP_');
                         const isCRef  = id.startsWith('CREF_');
                         const isAnyGroup = isGroup || isCRef;
@@ -4052,7 +4079,7 @@ const initializeDashboard = (json) => {
                               stroke={settings.color}
                               strokeWidth={isAnyGroup ? 3 : 1.5}
                               strokeDasharray={settings.strokeDash}
-                              dot={<CustomDot shapeType={settings.shape} isGroup={isAnyGroup} />}
+                              dot={false}
                               activeDot={{ r: isAnyGroup ? 6 : 4 }}
                               connectNulls
                               isAnimationActive={false}
