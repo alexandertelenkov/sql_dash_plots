@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Base resets ───────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #f8fafc;
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ── Scrollbar styling ─────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ── Recharts overrides ────────────────────────────────────── */
+.recharts-wrapper .recharts-surface {
+  overflow: visible;
+}
+
+.recharts-tooltip-wrapper {
+  z-index: 9999 !important;
+}
+
+/* ── Table cell highlight ──────────────────────────────────── */
+.cell-edited {
+  background-color: #fef9c3 !important;
+  outline: 1px solid #facc15;
+}
+
+.cell-excluded {
+  background-color: #fee2e2 !important;
+  outline: 1px solid #f87171;
+}
+
+/* ── Animated status dot ───────────────────────────────────── */
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.6; transform: scale(0.85); }
+}
+
+.status-dot {
+  animation: statusPulse 1.8s ease-in-out infinite;
+}
+
+/* ── Number input – hide spin arrows ──────────────────────── */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* ── Color picker – remove default border ─────────────────── */
+input[type="color"] {
+  padding: 1px;
+  cursor: pointer;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+}
+
+/* ── Print styles ──────────────────────────────────────────── */
+@media print {
+  .no-print { display: none !important; }
+  body { background: white; }
+}

@@ -1,0 +1,14 @@
+*
+!package.json
+!yarn.lock
+!packages
+!manifest.json
+!conf
+!README.md
+!images
+!.yarnrc.yml
+# Secrets — NEVER include in Docker image
+.env.server
+.env.local
+auth.json
+cspell.json

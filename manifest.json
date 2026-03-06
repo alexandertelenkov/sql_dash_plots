@@ -1,0 +1,27 @@
+{
+  "name": "ReactorIQ Ferm",
+  "description": "Fermentasion Dashboard Analysis and Viz",
+  "namespace": "private-takeda-gxp-dev",
+  "slug": "sql-tetra-viz-dash",
+  "version": "v0.5.1",
+  "icon": "images/icon.png",
+  "type": "connector",
+  "labels": [
+    {
+      "name": "subtype",
+      "value": "data-app"
+    },
+    {
+      "name": "ts-routing-style",
+      "value": "subdomain"
+    }
+  ],
+  "exposesPorts": {
+    "3000": {
+      "description": "http",
+      "required": true,
+      "hubDefaultPort": 3000
+    }
+  },
+  "platformRequirements": []
+}
